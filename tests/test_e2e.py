@@ -6,7 +6,7 @@ Needs `requests`. Point it at a CTFd that has NOT been set up yet and has this p
 mounted (see README). It creates an admin and a few users, then checks uploads, limits,
 permissions, CSRF, downloads and the request-size guard. Exit code 1 if anything fails.
 Optional env: REG_EXTRA='{"fields[1]":"1"}' adds required custom registration fields;
-EXPECT_KO=1 checks the Korean example catalog (copy examples/ko into writeups/translations/ first).
+EXPECT_KO=1 checks the Korean example catalog (copy examples/ko into translations/ko first).
 """
 
 import concurrent.futures
@@ -236,7 +236,7 @@ ko = session()
 ko.cookies.set("language", "ko")
 login(ko, "bob", "bob-Pass-123!")
 r = upload(ko, "tr.pdf", b"%PDF-1.4\n% ko\n")
-if os.environ.get("EXPECT_KO"):  # run with the example catalog installed (examples/ko -> writeups/translations/ko)
+if os.environ.get("EXPECT_KO"):  # run with the example catalog installed (examples/ko -> translations/ko)
     check("Korean catalog installed: server message translated", "라이트업이 제출되었습니다." in r.text)
     check("Korean catalog installed: page strings translated", "내 제출 현황" in r.text and "내 파일" in r.text)
 else:

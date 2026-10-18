@@ -44,7 +44,14 @@ translation (see [Translating](#translating)).
 
 ## Install
 
-Copy the `writeups/` folder to `CTFd/plugins/writeups/` and restart CTFd. With Docker Compose, mount it read-only:
+The repository root **is** the plugin, like most CTFd plugins, so clone it into `CTFd/plugins/` (folder name `writeups`) and restart CTFd:
+
+```bash
+cd CTFd/plugins
+git clone https://github.com/deploy103/ctfd-writeup-upload.git writeups
+```
+
+With Docker Compose, clone it next to your `docker-compose.yml` and mount it read-only:
 
 ```yaml
 services:
@@ -53,12 +60,14 @@ services:
       - ./writeups:/opt/CTFd/CTFd/plugins/writeups:ro
 ```
 
+The plugin works under any folder name; `writeups` is just the recommended one.
+
 The `writeups` table is created automatically on start. Uploaded files go to `UPLOAD_FOLDER/writeups/`
 (`/var/uploads/writeups/` in the official image); include that folder in your backups.
 
 ## Configuration
 
-The limits are constants at the top of `writeups/__init__.py`:
+The limits are constants at the top of `__init__.py`:
 
 | Constant | Default | Meaning |
 | --- | --- | --- |
@@ -76,22 +85,22 @@ The limits are constants at the top of `writeups/__init__.py`:
 English is built in and is the default. The language a user sees follows CTFd's normal language setting
 (the user's own *Settings → Language*, or the admin default).
 
-`writeups/translations/messages.pot` is the template with every message. To add a language, for example German:
+`translations/messages.pot` is the template with every message. To add a language, for example German:
 
 ```sh
 pip install babel
-pybabel init -i writeups/translations/messages.pot -d writeups/translations -l de
-# edit writeups/translations/de/LC_MESSAGES/messages.po (this is the text file you translate)
-pybabel compile -f -d writeups/translations      # writes messages.mo, the file CTFd actually reads
+pybabel init -i translations/messages.pot -d translations -l de
+# edit translations/de/LC_MESSAGES/messages.po (this is the text file you translate)
+pybabel compile -f -d translations      # writes messages.mo, the file CTFd actually reads
 ```
 
 Restart CTFd afterwards. Only the compiled `messages.mo` is needed at run time. The language must be one that CTFd
-offers. A ready-made **Korean** example is in `examples/ko/`; copy it to `writeups/translations/ko/` to use it.
+offers. A ready-made **Korean** example is in `examples/ko/`; copy it to `translations/ko/` to use it.
 The catalogs are merged with CTFd's own, so they do not touch `CTFd/translations`.
 
 If you change the plugin's messages, regenerate the template with
-`pybabel extract -F babel.cfg -k lazy_gettext -o writeups/translations/messages.pot .` and run
-`pybabel update -i writeups/translations/messages.pot -d writeups/translations`.
+`pybabel extract -F babel.cfg -k lazy_gettext -o translations/messages.pot .` and run
+`pybabel update -i translations/messages.pot -d translations`.
 
 ## Security design
 
@@ -146,7 +155,7 @@ deletes and ownership, permissions, CSRF, downloads and ZIPs, concurrency and th
 ```sh
 pip install requests
 python tests/test_e2e.py http://127.0.0.1:8000
-EXPECT_KO=1 python tests/test_e2e.py http://127.0.0.1:8000   # with examples/ko copied into writeups/translations/ko
+EXPECT_KO=1 python tests/test_e2e.py http://127.0.0.1:8000   # with examples/ko copied into translations/ko
 ```
 
 For a CTFd that requires extra registration fields add `REG_EXTRA='{"fields[1]":"1"}'` to either command.
