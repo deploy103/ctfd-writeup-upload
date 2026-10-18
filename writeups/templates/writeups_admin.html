@@ -43,7 +43,7 @@
     {% for g in groups %}
     <tbody>
       <tr class="writeups-group">
-        <th scope="rowgroup" colspan="4">{{ g.user.name }}<span class="group-meta">{{ _('%(n)d files', n=g.rows | length) }} · {{ _('%(size)d bytes', size=g.size) }}</span></th>
+        <th scope="rowgroup" colspan="4">{{ g.user.name }} <span class="group-meta">{{ _('%(n)d files', n=g.rows | length) }} · {{ _('%(size)d bytes', size=g.size) }}</span></th>
         <th><a class="btn btn-sm btn-outline-primary" href="{{ url_for('writeups.admin_download_user', user_id=g.user.id) }}">{{ _('Download user ZIP') }}</a></th>
       </tr>
       {% for w in g.rows %}

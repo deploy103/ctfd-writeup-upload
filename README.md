@@ -125,22 +125,36 @@ If you change the plugin's messages, regenerate the template with
 
 ## Tests
 
-`tests/test_e2e.py` is an end-to-end test that talks to a running CTFd over HTTP. Start a **fresh, not yet set up** CTFd
-with the plugin mounted, then:
+Both tests talk to a running CTFd. Start a **fresh, not yet set up** CTFd with the plugin mounted. They set CTFd up themselves.
+
+**`tests/test_browser.py`** drives a real browser the way people use the plugin: the navbar link, the login redirect,
+uploading with the progress bar, duplicates and validation, delete confirmations, the language chosen on the
+*Settings* page, then the admin side (Plugins menu, grouped list, single / per-user / all downloads, deletes).
+
+```sh
+pip install playwright requests && playwright install chromium
+python tests/test_browser.py http://127.0.0.1:8000
+# with a translation installed, e.g. the Korean example (the WORDS are the expected translated texts):
+LANGUAGE=ko WORDS='{"nav":"라이트업","title":"라이트업","upload":"라이트업 업로드","success":"라이트업이 제출되었습니다.","duplicate":"이미 제출한 것과 똑같은 파일입니다.","zip_user":"사용자 ZIP 다운로드","zip_all":"전체 다운로드 (ZIP)"}' \
+  python tests/test_browser.py http://127.0.0.1:8000
+```
+
+**`tests/test_e2e.py`** checks the HTTP behaviour in depth: uploads and rejections, the limits, duplicates, escaping,
+deletes and ownership, permissions, CSRF, downloads and ZIPs, concurrency and the request-size guard
+(including `//writeups`-style aliases).
 
 ```sh
 pip install requests
 python tests/test_e2e.py http://127.0.0.1:8000
-# CTFd with extra required registration fields:
-REG_EXTRA='{"fields[1]":"1"}' python tests/test_e2e.py http://127.0.0.1:8000
-# with the Korean example copied into writeups/translations/ko:
-EXPECT_KO=1 python tests/test_e2e.py http://127.0.0.1:8000
+EXPECT_KO=1 python tests/test_e2e.py http://127.0.0.1:8000   # with examples/ko copied into writeups/translations/ko
 ```
 
-It covers uploads and rejections, the limits, duplicates, escaping, deletes and ownership, permissions, CSRF,
-downloads and ZIPs, concurrency, the request-size guard (including `//writeups`-style aliases), the navbar link on the
-default theme and the language fallback. If it runs into the per-user rate limit it pauses for a minute and retries,
-so a full run can take a few minutes.
+For a CTFd that requires extra registration fields add `REG_EXTRA='{"fields[1]":"1"}'` to either command.
+If `test_e2e.py` runs into the per-user rate limit it pauses for a minute and retries, so a full run can take a few minutes.
+
+Tested combinations (all passing): stock `ctfd/ctfd:3.8.3` with the default theme in English, with the Korean example
+installed, and with a German catalog created by following the *Translating* steps above (only 7 messages translated,
+the rest correctly fall back to English); and a customised CTFd 3.8.3 fork using its `core` theme.
 
 ## Prior art and credits
 
