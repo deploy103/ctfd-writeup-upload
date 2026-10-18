@@ -1,0 +1,239 @@
+# Korean translations for the CTFd writeups plugin.
+# English msgids are the source text; this catalog is merged with CTFd's own
+# via BABEL_TRANSLATION_DIRECTORIES (see load() in __init__.py).
+msgid ""
+msgstr ""
+"Project-Id-Version: CTFd writeups plugin\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: __init__.py
+msgid "Choose a file."
+msgstr "파일을 선택하세요."
+
+#: __init__.py
+#, python-format
+msgid "Allowed formats: %(types)s"
+msgstr "허용 형식: %(types)s"
+
+#: __init__.py
+msgid "Empty files cannot be uploaded."
+msgstr "빈 파일은 올릴 수 없습니다."
+
+#: __init__.py
+#, python-format
+msgid "Files can be at most %(mb)d MB."
+msgstr "파일은 최대 %(mb)dMB입니다."
+
+#: __init__.py
+msgid "The file content does not match its extension."
+msgstr "파일 내용이 확장자와 일치하지 않습니다."
+
+#: __init__.py
+msgid "Writeup storage is full. Please contact an organizer."
+msgstr "제출 저장 공간이 가득 찼습니다. 운영자에게 문의하세요."
+
+#: __init__.py
+msgid "The server is low on disk space. Please contact an organizer."
+msgstr "서버 저장 공간이 부족합니다. 운영자에게 문의하세요."
+
+#: __init__.py
+msgid "Several requests were processed at once. Please try again."
+msgstr "동시에 여러 요청이 처리되었습니다. 다시 시도하세요."
+
+#: __init__.py
+msgid "Your writeup has been submitted."
+msgstr "라이트업이 제출되었습니다."
+
+#: __init__.py
+msgid "Too many uploads. Try again in a minute."
+msgstr "업로드가 너무 잦습니다. 1분 뒤에 다시 시도하세요."
+
+#: templates / __init__.py
+#, python-format
+msgid "%(n)d files"
+msgstr "파일 %(n)d개"
+
+#: templates / __init__.py
+msgid "Download user ZIP"
+msgstr "사용자 ZIP 다운로드"
+
+#: templates / __init__.py
+#, python-format
+msgid "Each upload is saved as a new file (up to %(n)d files, %(mb)d MB in total). Only administrators can download submissions."
+msgstr "업로드할 때마다 새 파일로 저장됩니다(최대 %(n)d개, 합계 %(mb)dMB). 제출 파일은 관리자만 다운로드할 수 있습니다."
+
+#: templates / __init__.py
+msgid "Files are grouped by participant. Times are shown in UTC."
+msgstr "파일은 참가자별로 묶여 있습니다. 시각은 UTC 기준입니다."
+
+#: templates / __init__.py
+msgid "Share your approach. You can submit several files."
+msgstr "문제를 해결한 과정을 공유해 주세요. 파일을 여러 개 제출할 수 있습니다."
+
+#: templates / __init__.py
+msgid "Total size"
+msgstr "전체 크기"
+
+#: templates / __init__.py
+msgid "Uploaded (UTC)"
+msgstr "업로드 일시 (UTC)"
+
+#: templates / __init__.py
+#, python-format
+msgid "You can submit up to %(n)d files. Delete one to upload another."
+msgstr "파일은 최대 %(n)d개까지 제출할 수 있습니다. 다른 파일을 올리려면 하나를 삭제하세요."
+
+#: templates / __init__.py
+msgid "Your files"
+msgstr "내 파일"
+
+#: templates / __init__.py
+#, python-format
+msgid "Your files would exceed %(mb)d MB in total. Delete one to upload another."
+msgstr "내 파일의 합계가 %(mb)dMB를 넘게 됩니다. 다른 파일을 올리려면 하나를 삭제하세요."
+
+#: templates / __init__.py
+msgid "Your submissions"
+msgstr "내 제출 현황"
+
+#: __init__.py
+msgid "You already submitted this exact file."
+msgstr "이미 제출한 것과 똑같은 파일입니다."
+
+#: templates
+#, python-format
+msgid "%(size)d bytes"
+msgstr "%(size)d바이트"
+
+#: templates
+msgid "Accepted formats"
+msgstr "허용 형식"
+
+#: templates
+msgid "Actions"
+msgstr "작업"
+
+#: templates
+msgid "Cancel"
+msgstr "취소"
+
+#: templates
+msgid "Choose a file"
+msgstr "파일 선택"
+
+#: templates
+msgid "Choose a file before uploading."
+msgstr "업로드할 파일을 먼저 선택해 주세요."
+
+#: templates
+msgid "Choose a non-empty file."
+msgstr "내용이 있는 파일을 선택해 주세요."
+
+#: templates
+msgid "Connection failed or timed out. The server may still have saved your file. Refresh submission status before trying again."
+msgstr "연결에 실패했거나 시간이 초과되었습니다. 서버에 파일이 저장되었을 수 있습니다. 제출 상태를 새로고침한 뒤 다시 시도해 주세요."
+
+#: templates
+msgid "Delete"
+msgstr "삭제"
+
+#: templates
+msgid "Delete this writeup? This cannot be undone."
+msgstr "이 라이트업을 삭제하시겠습니까? 되돌릴 수 없습니다."
+
+#: templates
+msgid "Download"
+msgstr "다운로드"
+
+#: templates
+msgid "Download all (ZIP)"
+msgstr "전체 다운로드 (ZIP)"
+
+#: templates
+msgid "File"
+msgstr "파일"
+
+#: templates
+msgid "Files"
+msgstr "파일"
+
+#: templates
+#, python-format
+msgid "Maximum size: %(size)s MiB"
+msgstr "최대 크기: %(size)s MiB"
+
+#: templates
+msgid "No writeup submitted yet."
+msgstr "아직 제출된 라이트업이 없습니다."
+
+#: templates
+msgid "Participants"
+msgstr "참가자"
+
+#: templates
+msgid "Ready to upload."
+msgstr "업로드할 준비가 되었습니다."
+
+#: templates
+msgid "Refresh submission status"
+msgstr "제출 상태 새로고침"
+
+#: templates
+msgid "Review participant submissions. Downloads are available to administrators only."
+msgstr "참가자의 제출 파일을 검토합니다. 관리자만 다운로드할 수 있습니다."
+
+#: templates
+msgid "Size"
+msgstr "크기"
+
+#: templates
+msgid "The server could not determine the upload size. Refresh the page and try again."
+msgstr "서버가 업로드 크기를 확인하지 못했습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요."
+
+#: templates
+msgid "The upload request is too large. Choose a smaller file."
+msgstr "업로드 요청이 너무 큽니다. 더 작은 파일을 선택해 주세요."
+
+#: templates
+msgid "This file type is not allowed."
+msgstr "허용되지 않는 파일 형식입니다."
+
+#: templates
+msgid "Upload cancelled. The server may already have received your file. Refresh submission status before trying again."
+msgstr "업로드를 취소했습니다. 서버가 이미 파일을 받았을 수 있습니다. 제출 상태를 새로고침한 뒤 다시 시도해 주세요."
+
+#: templates
+msgid "Upload not confirmed. Your session may have expired. Refresh submission status before trying again."
+msgstr "업로드 완료를 확인하지 못했습니다. 세션이 만료되었을 수 있습니다. 제출 상태를 새로고침한 뒤 다시 시도해 주세요."
+
+#: templates
+msgid "Upload progress"
+msgstr "업로드 진행률"
+
+#: templates
+msgid "Upload rate limit reached. Wait a minute before trying again."
+msgstr "업로드 횟수 제한에 도달했습니다. 1분 뒤 다시 시도해 주세요."
+
+#: templates
+msgid "Upload sent. Validating and saving…"
+msgstr "파일 전송 완료. 검증 및 저장 중…"
+
+#: templates
+msgid "Upload writeup"
+msgstr "라이트업 업로드"
+
+#: templates
+msgid "Uploading…"
+msgstr "업로드 중…"
+
+#: templates
+msgid "Waiting for a file."
+msgstr "파일 선택을 기다리는 중입니다."
+
+#: templates
+msgid "Writeups"
+msgstr "라이트업"

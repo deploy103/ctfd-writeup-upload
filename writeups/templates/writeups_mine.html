@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <style>
+    /* Colours are inherited from the active theme; borders use currentColor so the page works on light and dark themes. */
+    .writeups-page { max-width: 64rem; margin: 2rem auto 3rem; padding: 0 1rem; }
+    .writeups-page a { color: inherit; text-decoration: underline; }
+    .writeups-header h1 { margin-bottom: 0.4rem; }
+    .writeups-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 2.5rem; margin-top: 1.5rem; }
+    .writeups-summary { border-left: 1px solid; border-color: color-mix(in srgb, currentColor 22%, transparent); padding-left: 2rem; }
+    .writeups-page h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .writeups-page .form-control { width: 100%; }
+    .writeups-page progress { display: block; width: 100%; height: 0.8rem; margin: 1rem 0; }
+    .writeups-page [data-state="error"] { color: #c62828; }
+    .writeups-page [data-state="success"] { color: #2e7d32; }
+    @media (prefers-color-scheme: dark) {
+      .writeups-page [data-state="error"] { color: #ff9eab; }
+      .writeups-page [data-state="success"] { color: #80ddb6; }
+    }
+    .writeups-filename, .writeups-page dd, #writeup-status { overflow-wrap: anywhere; }
+    .writeups-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; }
+    .writeups-page dt { margin-top: 1rem; }
+    .writeups-files { margin-top: 2rem; }
+    .writeups-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .writeups-table { width: 100%; border-collapse: collapse; }
+    .writeups-table th, .writeups-table td { padding: 0.55rem 0.6rem; border-bottom: 1px solid; border-color: color-mix(in srgb, currentColor 22%, transparent); text-align: left; vertical-align: middle; overflow-wrap: anywhere; }
+    .writeups-table th:not(:first-child), .writeups-table td:not(:first-child) { white-space: nowrap; }
+    .writeups-table form { margin: 0; }
+    .writeups-page [hidden] { display: none !important; }
+    @media (max-width: 767px) {
+      .writeups-layout { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+      .writeups-summary { border-left: 0; padding-left: 0; border-top: 1px solid; border-color: color-mix(in srgb, currentColor 22%, transparent); padding-top: 1.5rem; }
+      .writeups-page .form-control { min-width: 0; max-width: 100%; }
+      .writeups-table thead { position: absolute; left: -9999px; }
+      .writeups-table, .writeups-table tbody, .writeups-table tr, .writeups-table td { display: block; width: 100%; }
+      .writeups-table tr { padding: 0.7rem 0; border-bottom: 1px solid; border-color: color-mix(in srgb, currentColor 22%, transparent); }
+      .writeups-table td { border: 0; padding: 0.15rem 0; white-space: normal; }
+      .writeups-table td:not(:first-child) { font-size: 0.9rem; opacity: 0.85; }
+      .writeups-table td:last-child { margin-top: 0.4rem; }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container writeups-page">
+  <div class="writeups-card">
+    <header class="writeups-header">
+      <h1>{{ _('Writeups') }}</h1>
+      <p class="text-muted">{{ _('Share your approach. You can submit several files.') }}</p>
+    </header>
+    <div class="writeups-layout">
+      <section aria-labelledby="writeup-upload-title">
+        <h2 id="writeup-upload-title">{{ _('Upload writeup') }}</h2>
+        <p>{{ _('Accepted formats') }}: {{ allowed | join(', ') }} · {{ _('Maximum size: %(size)s MiB', size=max_mb) }}</p>
+        <form id="writeup-form" method="POST" action="{{ url_for('writeups.mine') }}" enctype="multipart/form-data" novalidate
+              data-max-bytes="{{ max_mb * 1024 * 1024 }}" data-allowed="{{ allowed | join(',') }}">
+          <input type="hidden" name="nonce" value="{{ Session.nonce }}">
+          <div class="mb-3">
+            <div class="form-group">
+              <label class="form-label" for="writeup-file">{{ _('Choose a file') }}</label>
+              <input class="form-control" id="writeup-file" type="file" name="file" accept="{{ allowed | join(',') }}" required aria-describedby="writeup-replace-note">
+            </div>
+          </div>
+          <p id="writeup-replace-note" class="text-muted">{{ _('Each upload is saved as a new file (up to %(n)d files, %(mb)d MB in total). Only administrators can download submissions.', n=max_files, mb=max_user_mb) }}</p>
+          <div class="writeups-actions">
+            <button id="writeup-submit" class="btn btn-primary" type="submit">{{ _('Upload writeup') }}</button>
+            <button id="writeup-cancel" class="btn btn-outline-secondary" type="button" hidden>{{ _('Cancel') }}</button>
+          </div>
+          <label for="writeup-progress">{{ _('Upload progress') }}</label>
+          <progress id="writeup-progress" max="100" value="0">0%</progress>
+          <div id="writeup-result" data-state="{{ 'error' if errors else 'success' if infos else 'idle' }}">
+            <p id="writeup-status" role="status" aria-live="polite" aria-atomic="true">{% if errors %}{{ errors | join(' ') }}{% elif infos %}{{ infos | join(' ') }}{% else %}{{ _('Waiting for a file.') }}{% endif %}</p>
+          </div>
+          <a href="{{ url_for('writeups.mine') }}">{{ _('Refresh submission status') }}</a>
+        </form>
+      </section>
+      <aside id="writeup-summary" class="writeups-summary" aria-labelledby="writeup-summary-title">
+        <h2 id="writeup-summary-title">{{ _('Your submissions') }}</h2>
+        <dl>
+          <dt>{{ _('Files') }}</dt><dd id="writeup-count">{{ writeups | length }} / {{ max_files }}</dd>
+          <dt>{{ _('Total size') }}</dt><dd id="writeup-total">{{ _('%(size)d bytes', size=total_size) }}</dd>
+        </dl>
+      </aside>
+    </div>
+    <section id="writeup-files" class="writeups-files" aria-labelledby="writeup-files-title">
+      <h2 id="writeup-files-title">{{ _('Your files') }}</h2>
+      {% if writeups %}
+      <div class="writeups-table-scroll">
+        <table class="writeups-table">
+          <thead>
+            <tr><th scope="col">{{ _('File') }}</th><th scope="col">{{ _('Size') }}</th><th scope="col">{{ _('Uploaded (UTC)') }}</th><th scope="col">{{ _('Actions') }}</th></tr>
+          </thead>
+          <tbody>
+          {% for w in writeups %}
+            <tr>
+              <td class="writeups-filename">{{ w.original_name }}</td>
+              <td>{{ _('%(size)d bytes', size=w.size) }}</td>
+              <td>{{ writeup_when(w) }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('writeups.delete_mine', writeup_id=w.id) }}" class="writeup-delete" data-confirm="{{ _('Delete this writeup? This cannot be undone.') }}">
+                  <input type="hidden" name="nonce" value="{{ Session.nonce }}">
+                  <button class="btn btn-outline-danger btn-sm" type="submit">{{ _('Delete') }}</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p>{{ _('No writeup submitted yet.') }}</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+  (() => {
+    const form = document.getElementById('writeup-form');
+    const file = document.getElementById('writeup-file');
+    const submit = document.getElementById('writeup-submit');
+    const cancel = document.getElementById('writeup-cancel');
+    const progress = document.getElementById('writeup-progress');
+    const result = document.getElementById('writeup-result');
+    const status = document.getElementById('writeup-status');
+    const messages = {{ {
+      'waiting': _('Waiting for a file.'),
+      'ready': _('Ready to upload.'),
+      'missing': _('Choose a file before uploading.'),
+      'empty': _('Choose a non-empty file.'),
+      'type': _('This file type is not allowed.'),
+      'size': _('Maximum size: %(size)s MiB', size=max_mb),
+      'uploading': _('Uploading…'),
+      'validating': _('Upload sent. Validating and saving…'),
+      'length': _('The server could not determine the upload size. Refresh the page and try again.'),
+      'tooLarge': _('The upload request is too large. Choose a smaller file.'),
+      'rate': _('Upload rate limit reached. Wait a minute before trying again.'),
+      'unconfirmed': _('Upload not confirmed. Your session may have expired. Refresh submission status before trying again.'),
+      'network': _('Connection failed or timed out. The server may still have saved your file. Refresh submission status before trying again.'),
+      'cancelled': _('Upload cancelled. The server may already have received your file. Refresh submission status before trying again.')
+    } | tojson }};
+    let active = null;
+    document.addEventListener('submit', event => {
+      const del = event.target.closest && event.target.closest('.writeup-delete');
+      if (del && !window.confirm(del.dataset.confirm)) event.preventDefault();
+    });
+    function show(state, message) {
+      result.dataset.state = state;
+      status.textContent = message;
+    }
+    function restore(xhr) {
+      if (active !== xhr) return;
+      active = null;
+      file.disabled = submit.disabled = false;
+      cancel.hidden = true;
+      form.setAttribute('aria-busy', 'false');
+    }
+    file.addEventListener('change', () => {
+      progress.value = 0;
+      show('idle', file.files.length ? messages.ready : messages.waiting);
+    });
+    cancel.addEventListener('click', () => { if (active) active.abort(); });
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      if (active) return;
+      const selected = file.files[0];
+      let error;
+      if (!selected) error = messages.missing;
+      else if (!selected.size) error = messages.empty;
+      else if (selected.size > Number(form.dataset.maxBytes)) error = messages.size;
+      else if (!form.dataset.allowed.split(',').includes(selected.name.slice(selected.name.lastIndexOf('.')).toLowerCase())) error = messages.type;
+      if (error) { progress.value = 0; show('error', error); return; }
+      // Construct before disabling inputs: FormData retains the file AND CSRF nonce.
+      const body = new FormData(form);
+      const xhr = new XMLHttpRequest();
+      active = xhr;
+      xhr.open('POST', form.action);
+      xhr.timeout = 120000;
+      xhr.upload.addEventListener('progress', event => {
+        if (event.lengthComputable) {
+          const percent = Math.min(100, Math.floor(event.loaded / event.total * 100));
+          progress.value = percent;
+          show(percent === 100 ? 'validating' : 'uploading', percent === 100 ? messages.validating : messages.uploading + ' ' + percent + '%');
+        } else {
+          progress.removeAttribute('value');
+        }
+      });
+      xhr.upload.addEventListener('load', () => {
+        progress.value = 100;
+        show('validating', messages.validating);
+      });
+      xhr.addEventListener('load', () => {
+        // Login redirects can end in HTTP 200. Only this exact page's explicit
+        // server-rendered success marker confirms a saved submission.
+        const expected = new URL(form.action);
+        const actual = new URL(xhr.responseURL || form.action);
+        if (xhr.status !== 200 || actual.origin !== expected.origin || actual.pathname !== expected.pathname) {
+          progress.value = 0;
+          show('error', {411: messages.length, 413: messages.tooLarge, 429: messages.rate}[xhr.status] || messages.unconfirmed);
+          return;
+        }
+        const doc = new DOMParser().parseFromString(xhr.responseText, 'text/html');
+        const outcome = doc.getElementById('writeup-result');
+        const remoteStatus = doc.getElementById('writeup-status');
+        const files = doc.getElementById('writeup-files');
+        const summary = doc.getElementById('writeup-summary');
+        if (outcome && outcome.dataset.state === 'error' && remoteStatus) {
+          progress.value = 0;
+          show('error', remoteStatus.textContent);
+        } else if (outcome && outcome.dataset.state === 'success' && remoteStatus && files && summary) {
+          // Server-rendered, escaped markup of this same page; nodes are imported, never concatenated.
+          document.getElementById('writeup-files').replaceWith(document.importNode(files, true));
+          document.getElementById('writeup-summary').replaceWith(document.importNode(summary, true));
+          file.value = '';
+          progress.value = 100;
+          show('success', remoteStatus.textContent);
+        } else {
+          progress.value = 0;
+          show('error', messages.unconfirmed);
+        }
+      });
+      for (const event of ['error', 'timeout', 'abort']) {
+        xhr.addEventListener(event, () => {
+          progress.value = 0;
+          show('error', event === 'abort' ? messages.cancelled : messages.network);
+        });
+      }
+      xhr.addEventListener('loadend', () => restore(xhr));
+      file.disabled = submit.disabled = true;
+      cancel.hidden = false;
+      form.setAttribute('aria-busy', 'true');
+      progress.value = 0;
+      show('uploading', messages.uploading);
+      try { xhr.send(body); }
+      catch (_) { show('error', messages.network); restore(xhr); }
+    });
+  })();
+  </script>
+{% endblock %}

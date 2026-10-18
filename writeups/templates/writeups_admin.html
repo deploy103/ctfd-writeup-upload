@@ -1,0 +1,83 @@
+{% extends "admin/base.html" %}
+
+{% block stylesheets %}
+<style>
+  .writeups-admin { padding-bottom: 3rem; }
+  .writeups-admin td { overflow-wrap: anywhere; vertical-align: middle; }
+  .writeups-admin td:nth-child(2), .writeups-admin td:nth-child(3), .writeups-admin td:nth-child(4) { white-space: nowrap; }
+  .writeups-admin .btn { margin-bottom: 0.4rem; }
+  .writeups-admin .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .writeups-admin .writeups-group th { background: #e9ecef; border-top: 2px solid #adb5bd; }
+  .writeups-admin .writeups-group .group-meta { font-weight: normal; color: #495057; margin-left: 0.5rem; }
+  @media (max-width: 767px) {
+    .writeups-admin .table { min-width: 42rem; }
+    .writeups-admin th, .writeups-admin td { white-space: nowrap; }
+    .writeups-admin td:nth-child(1) { white-space: normal; min-width: 8rem; }
+    .writeups-admin caption { caption-side: bottom; white-space: normal; position: sticky; left: 0; width: calc(100vw - 2rem); }
+    /* keep the actions visible while the rest of the row scrolls */
+    .writeups-admin th:last-child, .writeups-admin td:last-child { position: sticky; right: 0; background: #fff; box-shadow: -6px 0 6px -6px rgba(0, 0, 0, 0.25); }
+    .writeups-admin .writeups-group th:last-child { background: #e9ecef; }
+    .writeups-admin .writeups-group th:first-child { white-space: normal; min-width: 14rem; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <h1>{{ _('Writeups') }}</h1>
+    <p>{{ _('Review participant submissions. Downloads are available to administrators only.') }}</p>
+  </div>
+</div>
+<div class="container writeups-admin">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="mb-0">{{ _('Participants') }}: <strong>{{ groups | length }}</strong> · {{ _('Files') }}: <strong>{{ count }}</strong> · {{ _('Total size') }}: <strong>{{ _('%(size)d bytes', size=total_size) }}</strong></p>
+    {% if count %}<a class="btn btn-primary" href="{{ url_for('writeups.admin_download_all') }}">{{ _('Download all (ZIP)') }}</a>{% endif %}
+  </div>
+  <div class="table-scroll">
+  <table class="table">
+    <caption>{{ _('Files are grouped by participant. Times are shown in UTC.') }}</caption>
+    <thead>
+      <tr><th scope="col">{{ _('File') }}</th><th scope="col">{{ _('Size') }}</th><th scope="col">SHA-256</th><th scope="col">{{ _('Uploaded (UTC)') }}</th><th scope="col">{{ _('Actions') }}</th></tr>
+    </thead>
+    {% for g in groups %}
+    <tbody>
+      <tr class="writeups-group">
+        <th scope="rowgroup" colspan="4">{{ g.user.name }}<span class="group-meta">{{ _('%(n)d files', n=g.rows | length) }} · {{ _('%(size)d bytes', size=g.size) }}</span></th>
+        <th><a class="btn btn-sm btn-outline-primary" href="{{ url_for('writeups.admin_download_user', user_id=g.user.id) }}">{{ _('Download user ZIP') }}</a></th>
+      </tr>
+      {% for w in g.rows %}
+      <tr>
+        <td>{{ w.original_name }}</td>
+        <td>{{ _('%(size)d bytes', size=w.size) }}</td>
+        <td><code title="{{ w.sha256 }}">{{ w.sha256[:16] }}…</code></td>
+        <td>{{ writeup_when(w) }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('writeups.admin_download', writeup_id=w.id) }}">{{ _('Download') }}</a>
+          <form method="POST" action="{{ url_for('writeups.admin_delete', writeup_id=w.id) }}" class="writeup-delete" data-confirm="{{ _('Delete this writeup? This cannot be undone.') }}">
+            <input type="hidden" name="nonce" value="{{ Session.nonce }}">
+            <button class="btn btn-sm btn-outline-danger" type="submit">{{ _('Delete') }}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody>
+      <tr><td colspan="5" class="text-center py-5">{{ _('No writeup submitted yet.') }}</td></tr>
+    </tbody>
+    {% endfor %}
+  </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  for (const form of document.querySelectorAll('.writeup-delete')) {
+    form.addEventListener('submit', event => {
+      if (!window.confirm(form.dataset.confirm)) event.preventDefault();
+    });
+  }
+</script>
+{% endblock %}
