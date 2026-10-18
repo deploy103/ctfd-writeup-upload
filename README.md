@@ -19,7 +19,7 @@ Most existing writeup plugins store plain text or only support manual grading. T
 **Participants** (log in, then open `/writeups`)
 
 - Upload up to **100 files** each: `.pdf .zip .md .txt`, max **20 MB** per file, **200 MB** in total
-- Every upload is a new file (nothing is replaced). A list shows name, size and time, and the file count (`4 / 100`)
+- Every upload is a new file (nothing is replaced). A list shows name, size (B, KB, MB, GB) and time, and the file count (`4 / 100`)
 - Delete your own files. Submitting the **same content twice is rejected**, whatever the file name
 - Upload progress bar
 - Participants **cannot download** anything, not even their own files

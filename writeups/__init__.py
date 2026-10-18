@@ -135,6 +135,19 @@ def _user_slug(w):
     )
 
 
+def _filesize(n):
+    """Human-readable size: 15 B, 1.5 KB, 9.9 MB, 2 GB (1024-based, one decimal)."""
+    n = max(int(n or 0), 0)
+    if n < 1024:
+        return "{} B".format(n)
+    value, units = float(n), ("KB", "MB", "GB", "TB")
+    for i, unit in enumerate(units):
+        value /= 1024
+        # round first so 1048575 B reads "1 MB", never "1024 KB"
+        if round(value, 1) < 1024 or i == len(units) - 1:
+            return "{} {}".format(("%.1f" % value).rstrip("0").rstrip("."), unit)
+
+
 def _when(w):
     """Upload time for display; falls back to `updated` for rows without `created`."""
     ts = w.created or w.updated
@@ -536,4 +549,5 @@ def load(app):
         return redirect(url_for("writeups.admin_list"))
 
     app.jinja_env.globals.setdefault("writeup_when", _when)
+    app.jinja_env.filters["filesize"] = _filesize
     app.register_blueprint(bp)

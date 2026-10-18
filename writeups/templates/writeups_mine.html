@@ -79,7 +79,7 @@
         <h2 id="writeup-summary-title">{{ _('Your submissions') }}</h2>
         <dl>
           <dt>{{ _('Files') }}</dt><dd id="writeup-count">{{ writeups | length }} / {{ max_files }}</dd>
-          <dt>{{ _('Total size') }}</dt><dd id="writeup-total">{{ _('%(size)d bytes', size=total_size) }}</dd>
+          <dt>{{ _('Total size') }}</dt><dd id="writeup-total"><span title="{{ _('%(size)d bytes', size=total_size) }}">{{ total_size | filesize }}</span></dd>
         </dl>
       </aside>
     </div>
@@ -95,7 +95,7 @@
           {% for w in writeups %}
             <tr>
               <td class="writeups-filename">{{ w.original_name }}</td>
-              <td>{{ _('%(size)d bytes', size=w.size) }}</td>
+              <td><span title="{{ _('%(size)d bytes', size=w.size) }}">{{ w.size | filesize }}</span></td>
               <td>{{ writeup_when(w) }}</td>
               <td>
                 <form method="POST" action="{{ url_for('writeups.delete_mine', writeup_id=w.id) }}" class="writeup-delete" data-confirm="{{ _('Delete this writeup? This cannot be undone.') }}">

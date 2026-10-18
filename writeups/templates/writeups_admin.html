@@ -31,7 +31,7 @@
 </div>
 <div class="container writeups-admin">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <p class="mb-0">{{ _('Participants') }}: <strong>{{ groups | length }}</strong> · {{ _('Files') }}: <strong>{{ count }}</strong> · {{ _('Total size') }}: <strong>{{ _('%(size)d bytes', size=total_size) }}</strong></p>
+    <p class="mb-0">{{ _('Participants') }}: <strong>{{ groups | length }}</strong> · {{ _('Files') }}: <strong>{{ count }}</strong> · {{ _('Total size') }}: <strong><span title="{{ _('%(size)d bytes', size=total_size) }}">{{ total_size | filesize }}</span></strong></p>
     {% if count %}<a class="btn btn-primary" href="{{ url_for('writeups.admin_download_all') }}">{{ _('Download all (ZIP)') }}</a>{% endif %}
   </div>
   <div class="table-scroll">
@@ -43,13 +43,13 @@
     {% for g in groups %}
     <tbody>
       <tr class="writeups-group">
-        <th scope="rowgroup" colspan="4">{{ g.user.name }} <span class="group-meta">{{ _('%(n)d files', n=g.rows | length) }} · {{ _('%(size)d bytes', size=g.size) }}</span></th>
+        <th scope="rowgroup" colspan="4">{{ g.user.name }} <span class="group-meta">{{ _('%(n)d files', n=g.rows | length) }} · <span title="{{ _('%(size)d bytes', size=g.size) }}">{{ g.size | filesize }}</span></span></th>
         <th><a class="btn btn-sm btn-outline-primary" href="{{ url_for('writeups.admin_download_user', user_id=g.user.id) }}">{{ _('Download user ZIP') }}</a></th>
       </tr>
       {% for w in g.rows %}
       <tr>
         <td>{{ w.original_name }}</td>
-        <td>{{ _('%(size)d bytes', size=w.size) }}</td>
+        <td><span title="{{ _('%(size)d bytes', size=w.size) }}">{{ w.size | filesize }}</span></td>
         <td><code title="{{ w.sha256 }}">{{ w.sha256[:16] }}…</code></td>
         <td>{{ writeup_when(w) }}</td>
         <td>

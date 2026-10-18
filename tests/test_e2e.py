@@ -128,6 +128,9 @@ check("2MB accepted", OK_MSG in upload(alice, "huge.pdf", b"%PDF-" + b"A" * (2 *
 check("same content, same name rejected", DUP_MSG in upload(alice, "first writeup.pdf", PDF).text)
 check("same content, other name rejected", DUP_MSG in upload(alice, "renamed.pdf", PDF).text)
 check("duplicates were not stored", len(my_files(alice)[0]) == 5)
+mine = alice.get(BASE + "/writeups").text
+check("participant page shows human-readable sizes", ">2 MB<" in mine and re.search(r">\d+ B<", mine) is not None and "bytes</td>" not in mine)
+check("exact byte count stays in the tooltip", 'title="2097157 bytes"' in mine)
 check("another participant may submit the same bytes", OK_MSG in upload(bob, "same.pdf", PDF).text)
 
 # --- escaping ----------------------------------------------------------------------------------------
@@ -159,6 +162,7 @@ for p in ("/writeups/1", "/plugins/writeups/assets/", "/files/writeups/anything"
 # --- admin: grouped, per-user and overall ZIP -------------------------------------------------------------
 page = admin.get(BASE + "/admin/writeups").text
 check("admin list is grouped by participant", "alice" in page and "bob" in page and "4 files" in page, re.findall(r"\d+ files", page))
+check("admin page shows human-readable sizes", ">2 MB<" in page and re.search(r">\d+ B<", page) is not None and "bytes</td>" not in page)
 check("html filename is escaped in the admin page", "<img src=x" not in page and "&lt;img src=x" in page)
 first_id = next(i for i, nm in my_files(alice)[0] if nm == "first writeup.pdf")
 r = admin.get(BASE + "/admin/writeups/%s/download" % first_id)
