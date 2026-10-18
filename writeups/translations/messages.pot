@@ -1,0 +1,202 @@
+# Translations template for ctfd-writeup-upload.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the ctfd-writeup-upload
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: ctfd-writeup-upload VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-10-18 04:46+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "Choose a file."
+msgstr ""
+
+#, python-format
+msgid "Allowed formats: %(types)s"
+msgstr ""
+
+msgid "Empty files cannot be uploaded."
+msgstr ""
+
+#, python-format
+msgid "Files can be at most %(mb)d MB."
+msgstr ""
+
+msgid "The file content does not match its extension."
+msgstr ""
+
+msgid "The server is low on disk space. Please contact an organizer."
+msgstr ""
+
+msgid "You already submitted this exact file."
+msgstr ""
+
+#, python-format
+msgid "You can submit up to %(n)d files. Delete one to upload another."
+msgstr ""
+
+#, python-format
+msgid "Your files would exceed %(mb)d MB in total. Delete one to upload another."
+msgstr ""
+
+msgid "Writeup storage is full. Please contact an organizer."
+msgstr ""
+
+msgid "Writeups"
+msgstr ""
+
+msgid "Too many uploads. Try again in a minute."
+msgstr ""
+
+msgid "Your writeup has been submitted."
+msgstr ""
+
+msgid ""
+"Review participant submissions. Downloads are available to administrators"
+" only."
+msgstr ""
+
+msgid "Participants"
+msgstr ""
+
+msgid "Files"
+msgstr ""
+
+msgid "Total size"
+msgstr ""
+
+#, python-format
+msgid "%(size)d bytes"
+msgstr ""
+
+msgid "Download all (ZIP)"
+msgstr ""
+
+msgid "Files are grouped by participant. Times are shown in UTC."
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Uploaded (UTC)"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+#, python-format
+msgid "%(n)d files"
+msgstr ""
+
+msgid "Download user ZIP"
+msgstr ""
+
+msgid "Download"
+msgstr ""
+
+msgid "Delete this writeup? This cannot be undone."
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "No writeup submitted yet."
+msgstr ""
+
+msgid "Share your approach. You can submit several files."
+msgstr ""
+
+msgid "Upload writeup"
+msgstr ""
+
+msgid "Accepted formats"
+msgstr ""
+
+#, python-format
+msgid "Maximum size: %(size)s MiB"
+msgstr ""
+
+msgid "Choose a file"
+msgstr ""
+
+#, python-format
+msgid ""
+"Each upload is saved as a new file (up to %(n)d files, %(mb)d MB in "
+"total). Only administrators can download submissions."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Upload progress"
+msgstr ""
+
+msgid "Waiting for a file."
+msgstr ""
+
+msgid "Refresh submission status"
+msgstr ""
+
+msgid "Your submissions"
+msgstr ""
+
+msgid "Your files"
+msgstr ""
+
+msgid "Ready to upload."
+msgstr ""
+
+msgid "Choose a file before uploading."
+msgstr ""
+
+msgid "Choose a non-empty file."
+msgstr ""
+
+msgid "This file type is not allowed."
+msgstr ""
+
+msgid "Uploading…"
+msgstr ""
+
+msgid "Upload sent. Validating and saving…"
+msgstr ""
+
+msgid ""
+"The server could not determine the upload size. Refresh the page and try "
+"again."
+msgstr ""
+
+msgid "The upload request is too large. Choose a smaller file."
+msgstr ""
+
+msgid "Upload rate limit reached. Wait a minute before trying again."
+msgstr ""
+
+msgid ""
+"Upload not confirmed. Your session may have expired. Refresh submission "
+"status before trying again."
+msgstr ""
+
+msgid ""
+"Connection failed or timed out. The server may still have saved your "
+"file. Refresh submission status before trying again."
+msgstr ""
+
+msgid ""
+"Upload cancelled. The server may already have received your file. Refresh"
+" submission status before trying again."
+msgstr ""
+

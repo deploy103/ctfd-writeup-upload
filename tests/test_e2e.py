@@ -5,7 +5,8 @@ Usage:  python tests/test_e2e.py http://127.0.0.1:8000
 Needs `requests`. Point it at a CTFd that has NOT been set up yet and has this plugin
 mounted (see README). It creates an admin and a few users, then checks uploads, limits,
 permissions, CSRF, downloads and the request-size guard. Exit code 1 if anything fails.
-Optional env: REG_EXTRA='{"fields[1]":"1"}' adds required custom registration fields.
+Optional env: REG_EXTRA='{"fields[1]":"1"}' adds required custom registration fields;
+EXPECT_KO=1 checks the Korean example catalog (copy examples/ko into writeups/translations/ first).
 """
 
 import concurrent.futures
@@ -223,13 +224,19 @@ for path, cl in (("/writeups", 5000000000), ("//writeups", 5000000000), ("///wri
     check("oversized body to %s -> 413 before parsing" % path, status(raw((head.format(path) + "Content-Length: %d\r\n\r\n--b\r\n" % cl).encode())) == ["413"])
 check("a normal small POST still reaches CTFd (403 CSRF)", post(anon, "/writeups", data={"x": "y"}).status_code == 403)
 
-# --- translations ---------------------------------------------------------------------------------------------
+# --- navbar link and language ---------------------------------------------------------------------------
+nav = alice.get(BASE + "/challenges").text
+check("default theme shows a Writeups link in the navbar", re.search(r'href="[^"]*/writeups"[^>]*>\s*Writeups\s*<', nav) is not None)
+check("the link is also shown to logged-out visitors (they are sent to login)", re.search(r'href="[^"]*/writeups"', anon.get(BASE + "/login").text) is not None)
 ko = session()
 ko.cookies.set("language", "ko")
 login(ko, "bob", "bob-Pass-123!")
 r = upload(ko, "tr.pdf", b"%PDF-1.4\n% ko\n")
-check("Korean: server message translated", "라이트업이 제출되었습니다." in r.text)
-check("Korean: page strings translated", "내 제출 현황" in r.text and "내 파일" in r.text)
+if os.environ.get("EXPECT_KO"):  # run with the example catalog installed (examples/ko -> writeups/translations/ko)
+    check("Korean catalog installed: server message translated", "라이트업이 제출되었습니다." in r.text)
+    check("Korean catalog installed: page strings translated", "내 제출 현황" in r.text and "내 파일" in r.text)
+else:
+    check("no catalog installed: English is the default for any language", OK_MSG in r.text and "Your submissions" in r.text)
 
 # --- rate limit last (it exhausts the window) -----------------------------------------------------------------
 codes = [upload(bob, "x.exe", PDF, retry=False).status_code for _ in range(35)]

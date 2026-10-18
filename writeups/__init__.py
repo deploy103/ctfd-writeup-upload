@@ -26,18 +26,20 @@ from flask import (
     send_file,
     url_for,
 )
-from flask_babel import gettext
+from flask_babel import gettext, lazy_gettext
 from sqlalchemy import func, inspect, text
 from werkzeug.utils import secure_filename
 
 from CTFd.cache import cache
 from CTFd.models import Users, db
+from CTFd.plugins import register_user_page_menu_bar
 from CTFd.utils.decorators import admins_only, authed_only, require_verified_emails
 from CTFd.utils.user import get_current_user
 
 MAX_BYTES = 20 * 1024 * 1024
 ALLOWED = {".pdf", ".zip", ".md", ".txt"}
 MAX_NAME = 255
+SHOW_NAV_LINK = True  # add a "Writeups" link to the navbar of themes that list plugin pages (the default theme does)
 MAX_USER_TOTAL = (
     200 * 1024 * 1024
 )  # per participant, so one account cannot fill the store
@@ -375,6 +377,9 @@ def load(app):
     except Exception:  # another worker may have upgraded the table first
         app.logger.warning("writeups: user_id unique upgrade skipped", exc_info=True)
     app.wsgi_app = _BodyLimit(app.wsgi_app)
+    if SHOW_NAV_LINK:
+        # Shown to everyone, like CTFd's own custom pages; logged-out visitors are sent to the login page.
+        register_user_page_menu_bar(lazy_gettext("Writeups"), UPLOAD_PATH)
     # Ship our Korean strings inside the plugin so they never conflict with the
     # global catalog; Flask-Babel merges every directory listed here.
     dirs = app.config.get("BABEL_TRANSLATION_DIRECTORIES") or "translations"

@@ -1,5 +1,7 @@
 # ctfd-writeup-upload
 
+[한국어 안내](README.ko.md)
+
 A [CTFd](https://github.com/CTFd/CTFd) plugin that lets participants upload their **writeups as files** after a CTF,
 and lets admins download them, grouped by participant.
 
@@ -10,7 +12,7 @@ Most existing writeup plugins store plain text or only support manual grading. T
 | --- | --- |
 | ![participant page](docs/participant.png) | ![admin page](docs/admin.png) |
 
-(Screenshots: stock CTFd 3.8.3 `core` theme, Korean locale.)
+(Screenshots: stock CTFd 3.8.3 with the default `core` theme, no customisation.)
 
 ## Features
 
@@ -28,15 +30,17 @@ Most existing writeup plugins store plain text or only support manual grading. T
 - Download one file, **one participant's files as a ZIP**, or **everything as a ZIP** (streamed, no temporary disk)
 - Delete a file
 
-English is the source language of all messages. A Korean translation is included; add another language by putting a
-catalog in `writeups/translations/<lang>/LC_MESSAGES/`.
+Works **out of the box on CTFd's default `core` theme** (the one tested): a *Writeups* link appears in the navbar on
+its own, the pages use plain Bootstrap markup, and no theme or template has to be edited. Other themes may style the
+pages differently or may not list plugin links, see [Requirements](#requirements). Everything is in **English** unless you add a
+translation (see [Translating](#translating)).
 
 ## Requirements
 
 - CTFd **3.8.x** (tested on the stock `ctfd/ctfd:3.8.3` image with the default `core` theme)
 - **MariaDB/MySQL** recommended (the per-user limits rely on row locking). SQLite works for throw-away test installs only
-- Works with any theme that extends `base.html`. The plugin does not edit themes, so add a link to `/writeups` to your
-  navbar yourself
+- No theme changes needed on the default theme. The navbar link is added through CTFd's plugin menu API. Themes that do not render plugin
+  links (or that already have their own link) can set `SHOW_NAV_LINK = False` and link to `/writeups` themselves
 
 ## Install
 
@@ -65,6 +69,29 @@ The limits are constants at the top of `writeups/__init__.py`:
 | `MIN_FREE_BYTES` | 1 GiB | free disk space that must remain |
 | `USER_LIMIT` | 30 | uploads and deletes per participant per minute |
 | `ALLOWED` | `.pdf .zip .md .txt` | accepted extensions |
+| `SHOW_NAV_LINK` | `True` | add the *Writeups* link to the navbar |
+
+## Translating
+
+English is built in and is the default. The language a user sees follows CTFd's normal language setting
+(the user's own *Settings → Language*, or the admin default).
+
+`writeups/translations/messages.pot` is the template with every message. To add a language, for example German:
+
+```sh
+pip install babel
+pybabel init -i writeups/translations/messages.pot -d writeups/translations -l de
+# edit writeups/translations/de/LC_MESSAGES/messages.po (this is the text file you translate)
+pybabel compile -f -d writeups/translations      # writes messages.mo, the file CTFd actually reads
+```
+
+Restart CTFd afterwards. Only the compiled `messages.mo` is needed at run time. The language must be one that CTFd
+offers. A ready-made **Korean** example is in `examples/ko/`; copy it to `writeups/translations/ko/` to use it.
+The catalogs are merged with CTFd's own, so they do not touch `CTFd/translations`.
+
+If you change the plugin's messages, regenerate the template with
+`pybabel extract -F babel.cfg -k lazy_gettext -o writeups/translations/messages.pot .` and run
+`pybabel update -i writeups/translations/messages.pot -d writeups/translations`.
 
 ## Security design
 
@@ -104,13 +131,16 @@ with the plugin mounted, then:
 ```sh
 pip install requests
 python tests/test_e2e.py http://127.0.0.1:8000
-# if your CTFd requires extra registration fields:
+# CTFd with extra required registration fields:
 REG_EXTRA='{"fields[1]":"1"}' python tests/test_e2e.py http://127.0.0.1:8000
+# with the Korean example copied into writeups/translations/ko:
+EXPECT_KO=1 python tests/test_e2e.py http://127.0.0.1:8000
 ```
 
 It covers uploads and rejections, the limits, duplicates, escaping, deletes and ownership, permissions, CSRF,
-downloads and ZIPs, concurrency, the request-size guard (including `//writeups`-style aliases) and translations.
-If it runs into the per-user rate limit it pauses for a minute and retries, so a full run can take a few minutes.
+downloads and ZIPs, concurrency, the request-size guard (including `//writeups`-style aliases), the navbar link on the
+default theme and the language fallback. If it runs into the per-user rate limit it pauses for a minute and retries,
+so a full run can take a few minutes.
 
 ## Prior art and credits
 
@@ -126,14 +156,3 @@ The file-storage approach follows the principles of CTFd's own uploader (random 
 ## License
 
 [MIT](LICENSE)
-
----
-
-## 한국어 안내
-
-CTFd에서 대회가 끝난 뒤 참가자가 **라이트업을 파일로 제출**하고 관리자가 내려받는 플러그인입니다.
-
-- 참가자: `/writeups`에서 `.pdf .zip .md .txt` 파일을 사용자당 최대 100개(파일당 20MB, 합계 200MB) 올리고, 내 파일 목록을 보고, 내 파일을 삭제합니다. 같은 내용의 파일을 다시 올리면 거절됩니다. 참가자는 올린 파일을 내려받을 수 없습니다.
-- 관리자: `/admin/writeups`에서 참가자별로 묶인 목록을 보고, 파일별·사용자별 ZIP·전체 ZIP으로 내려받고, 삭제합니다.
-- 설치: `writeups/` 폴더를 `CTFd/plugins/writeups/`에 복사하고 CTFd를 재시작합니다. 테마를 수정하지 않으므로 네비게이션 바에 `/writeups` 링크는 직접 추가해야 합니다.
-- 한국어 번역이 들어 있습니다(영어가 원문). MariaDB/MySQL을 권장합니다.
